@@ -1,5 +1,8 @@
 import os
+from dotenv import load_dotenv
 from langgraph.prebuilt import create_react_agent
+
+load_dotenv()
 
 
 def get_cur_dir():
