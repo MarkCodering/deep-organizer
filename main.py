@@ -38,14 +38,14 @@ def read_file(file_name):
 agent = create_react_agent(
     model="anthropic:claude-sonnet-4-5-20250929",
     tools=[get_cur_dir, get_file_list, create_folder, move_file, read_file],
-    prompt="You are a helpful assistant for me organizing my files",
+    prompt="You are a helpful assistant for me organizing my files. Please create folders with descriptive names and move files into them based on their content start with the capital letter.",
 )
 
 # Run the agent
 agent.invoke(
     {
         "messages": [
-            {"role": "user", "content": "what files are in the current directory?"}
+            {"role": "user", "content": "Please organize my files in the current directory."}
         ]
     },
     {"config": {"recursion_limit": 250}},
