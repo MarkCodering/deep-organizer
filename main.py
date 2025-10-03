@@ -3,20 +3,24 @@ from langgraph.prebuilt import create_react_agent
 
 
 def get_cur_dir():
+    """Returns the current directory path."""
     return os.path.dirname(os.path.abspath(__file__))
 
 
 def get_file_list():
+    """Returns a list of files in the current directory."""
     return os.listdir(get_cur_dir())
 
 
 def create_folder(folder_name):
+    """Creates a new folder in the current directory."""
     path = os.path.join(get_cur_dir(), folder_name)
     os.makedirs(path, exist_ok=True)
     return f"Folder '{folder_name}' created at {path}"
 
 
 def move_file(file_name, dest_folder):
+    """Moves a file to the specified folder."""
     src_path = os.path.join(get_cur_dir(), file_name)
     dest_path = os.path.join(get_cur_dir(), dest_folder, file_name)
     if os.path.exists(src_path) and os.path.exists(os.path.dirname(dest_path)):
@@ -27,6 +31,7 @@ def move_file(file_name, dest_folder):
 
 
 def read_file(file_name):
+    """Reads the content of a file."""
     path = os.path.join(get_cur_dir(), file_name)
     if os.path.exists(path):
         with open(path, "r") as file:
