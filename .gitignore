@@ -1,2 +1,7 @@
 .env
 venv/
+deep_organizer.egg-info/
+build/
+deep_organizer/__pycache__/
+__pycache__/
+dist/

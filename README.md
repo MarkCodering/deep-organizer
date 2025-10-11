@@ -8,12 +8,13 @@ Deep Organizer is now a native-feeling desktop experience for macOS crafted with
 
 ## Features
 
-- 🧠 **AI-Powered Analysis**: Uses GPT models to understand file content and context
-- 📂 **Smart Folder Creation**: Automatically creates descriptive folders with proper naming
-- 🔒 **Safety First**: Protects important system files and folders from being moved
-- 📄 **Content-Based Organization**: Analyzes file contents, not just extensions
-- ⚡ **Automated Workflow**: Single command execution with comprehensive reporting
-- 🛡️ **Error Handling**: Robust error handling and validation
+- 🍎 **Native macOS polish**: Gradient hero header, glassmorphism cards, and SF Pro typography for a first-class desktop feel
+- 🧠 **AI-powered analysis**: Uses OpenAI or Anthropic models to understand file content and context
+- 📂 **Smart folder creation**: Automatically creates descriptive folders with proper naming
+- 🔑 **In-app API key management**: Store keys locally, toggle visibility, and run sessions without touching the shell
+- 📄 **Content-based organization**: Analyzes file contents, not just extensions, to determine intent
+- ⚡ **Automated workflow**: Dry-run previews, background worker threads, and real-time activity logs keep you informed
+- 🛡️ **Safety-first defaults**: Built-in exclusions guard critical files and folders from accidental moves
 
 ## Installation
 
@@ -31,13 +32,21 @@ Deep Organizer is now a native-feeling desktop experience for macOS crafted with
    ```
 
 2. **Install the package with GUI dependencies**:
+
    ```bash
    pip install -e .
    ```
 
    Or for development with extra dependencies:
+
    ```bash
    pip install -e ".[dev]"
+   ```
+
+   Planning to ship a desktop bundle?
+
+   ```bash
+   pip install -e ".[packaging]"
    ```
 
 ### Environment Setup
@@ -56,14 +65,14 @@ export OPENAI_API_KEY="your_openai_api_key_here"
 
 ### Launch the desktop app (macOS)
 
-1. Ensure your OpenAI API key is configured (see [Environment Setup](#environment-setup)).
-2. Start the GUI:
+1. Start the GUI:
 
    ```bash
    python main.py
    ```
 
-3. Choose the directory you want to organize, adjust the AI model or limits if desired, and click **Start Organizing**. Use the dry run toggle to preview the plan before committing changes.
+2. Paste an API key into the **API Access** panel (or let the app detect a saved/env key), then choose the directory you want to organize.
+3. Adjust the AI model or limits if desired, and click **Start Organizing**. Use the dry run toggle to preview the plan before committing changes.
 
 ### Command Line Interface (optional)
 
@@ -75,6 +84,26 @@ deep-organizer
 
 # Run a dry run
 deep-organizer --dry-run
+```
+
+### Build a native macOS app bundle
+
+1. Install the optional packaging tools (already included if you ran `pip install -e ".[packaging]"`).
+2. (Optional) Provide a custom icon: drop a `deep_organizer.icns` file into `packaging/mac/`. An editable `deep_organizer.svg` is supplied for convenience.
+   > Tip: Convert the SVG to an ICNS by exporting PNG sizes (16–1024 px) and running `iconutil -c icns <iconset>` on macOS.
+3. Run the build script from the project root:
+
+   ```bash
+   packaging/mac/build_app.sh
+   ```
+
+   Set `PYTHON_BIN` if you want to point at a specific interpreter, and append `--with-dmg` to produce a distributable DMG (`hdiutil` required).
+
+The script assembles `dist/Deep Organizer.app`. Sign and notarize it before sharing:
+
+```bash
+codesign --deep --force --sign "Developer ID Application: Your Name" "dist/Deep Organizer.app"
+xcrun notarytool submit "dist/Deep Organizer.app" --apple-id <apple-id> --team-id <team-id> --password <app-specific-password>
 ```
 
 ### What the Tool Does

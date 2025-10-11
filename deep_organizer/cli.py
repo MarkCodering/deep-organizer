@@ -36,8 +36,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--model",
         type=str,
-        default="openai:gpt-4-mini",
-        help="AI model to use for organization (default: openai:gpt-4-mini)"
+        default="openai:gpt-4o-mini",
+        help="AI model to use for organization (default: openai:gpt-4o-mini)"
     )
     
     parser.add_argument(
