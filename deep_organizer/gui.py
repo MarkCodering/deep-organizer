@@ -96,10 +96,7 @@ class OrganizerWindow(QMainWindow):
         self._model_select = QComboBox()
         self._model_select.addItems(
             [
-                "openai:gpt-4-mini",
                 "openai:gpt-4o-mini",
-                "openai:gpt-4.1-mini",
-                "anthropic:claude-3-sonnet",
             ]
         )
 
