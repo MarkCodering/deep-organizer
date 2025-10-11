@@ -4,7 +4,7 @@
 
 ## Overview
 
-Deep Organizer is a Python-based AI agent that uses LangGraph and OpenAI's GPT models to intelligently analyze and organize files in a directory. The agent reads file contents, understands their purpose, creates appropriately named folders, and moves files into logical groupings automatically.
+Deep Organizer is now a native-feeling desktop experience for macOS crafted with PySide6. The modern interface guides you through selecting a workspace, configuring your preferred AI model, and running a dry run or full organization in just a few clicks. Behind the scenes it still uses LangGraph and OpenAI (or Anthropic) models to intelligently analyze and organize files, creating folders and moving documents exactly where they belong.
 
 ## Features
 
@@ -22,13 +22,7 @@ Deep Organizer is a Python-based AI agent that uses LangGraph and OpenAI's GPT m
 - Python 3.8 or higher
 - OpenAI API key (for GPT model access)
 
-### Option 1: Install from PyPI (Recommended)
-
-```bash
-pip install deep-organizer
-```
-
-### Option 2: Install from Source
+### Installation
 
 1. **Clone the repository**:
    ```bash
@@ -36,7 +30,7 @@ pip install deep-organizer
    cd deep-organizer
    ```
 
-2. **Install the package**:
+2. **Install the package with GUI dependencies**:
    ```bash
    pip install -e .
    ```
@@ -60,51 +54,27 @@ export OPENAI_API_KEY="your_openai_api_key_here"
 
 ## Usage
 
-### Command Line Interface
+### Launch the desktop app (macOS)
 
-After installation, you can use `deep-organizer` from anywhere in your terminal.
+1. Ensure your OpenAI API key is configured (see [Environment Setup](#environment-setup)).
+2. Start the GUI:
 
-#### Basic Usage
+   ```bash
+   python main.py
+   ```
+
+3. Choose the directory you want to organize, adjust the AI model or limits if desired, and click **Start Organizing**. Use the dry run toggle to preview the plan before committing changes.
+
+### Command Line Interface (optional)
+
+The original CLI experience remains available for automation or remote environments:
 
 ```bash
 # Organize files in the current directory
 deep-organizer
 
-# Organize files in a specific directory
-deep-organizer --directory ~/Downloads
-
-# Preview what would be organized (dry run)
+# Run a dry run
 deep-organizer --dry-run
-```
-
-#### Advanced Options
-
-```bash
-# Use verbose output to see detailed progress
-deep-organizer --verbose
-
-# Use a different AI model
-deep-organizer --model "openai:gpt-4"
-
-# Exclude additional files or folders
-deep-organizer --exclude-files "secret.txt" "private.doc" \
-                --exclude-folders "temp" "cache"
-
-# Adjust file reading limit
-deep-organizer --max-file-size 2000
-
-# Check environment setup
-deep-organizer --check-env
-```
-
-#### Complete Example
-
-```bash
-# Organize Downloads folder with verbose output and dry-run first
-deep-organizer --directory ~/Downloads --dry-run --verbose
-
-# If satisfied with the preview, run for real
-deep-organizer --directory ~/Downloads --verbose
 ```
 
 ### What the Tool Does
@@ -174,24 +144,21 @@ The AI agent follows this workflow:
 
 ### Model Configuration
 
-By default, the agent uses `openai:gpt-4-mini`. You can modify this in `main.py`:
+The GUI exposes model selection directly in the interface. For scripted usage, instantiate `FileOrganizer` with your desired model:
 
 ```python
-agent = create_react_agent(
-    model="openai:gpt-4",  # or "anthropic:claude-3-sonnet" etc.
-    tools=[get_cur_dir, get_file_list, create_folder, move_file, read_file],
-    # ...
-)
+from deep_organizer import FileOrganizer
+
+organizer = FileOrganizer(model="anthropic:claude-3-sonnet")
+organizer.organize(dry_run=True)
 ```
 
 ### Safety Limits
 
-Adjust these constants in `main.py` as needed:
+Adjust limits programmatically when creating the `FileOrganizer` instance:
 
 ```python
-MAX_FILE_READ_SIZE = 1000  # Characters to read per file
-EXCLUDED_FILES = {".env", "main.py", ".gitignore", "requirements.txt"}
-EXCLUDED_FOLDERS = {"venv", "__pycache__", ".git"}
+FileOrganizer(max_file_read_size=2000)
 ```
 
 ## Examples
