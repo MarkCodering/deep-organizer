@@ -41,7 +41,8 @@ keywords = [
 dependencies = [
     "langgraph",
     "langchain[anthropic]",
-    "python-dotenv"
+    "python-dotenv",
+    "PySide6>=6.6"
 ]
 
 [project.optional-dependencies]
