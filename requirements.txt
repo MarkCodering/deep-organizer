@@ -1,4 +1,6 @@
 langgraph
 langchain[anthropic]
+langchain[openai]
+PySide6
 python-dotenv
 PySide6>=6.6
