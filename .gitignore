@@ -5,3 +5,4 @@ build/
 deep_organizer/__pycache__/
 __pycache__/
 dist/
+.venv/
