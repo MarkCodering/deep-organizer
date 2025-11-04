@@ -1,0 +1,345 @@
+Date/Time:       2025-10-17 11:46:24 
+Command line:    .venv/bin/briefcase run
+
+OS Release:      Darwin 25.0.0
+OS Version:      Darwin Kernel Version 25.0.0: Wed Sep 17 21:38:03 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T8112
+Architecture:    arm64
+Platform:        macOS-26.0.1-arm64-arm-64bit
+
+Python exe:      /Users/mark/Documents/Dev/deep-organizer/.venv/bin/python
+Python version:  3.9.6 (default, Aug  8 2025, 19:06:38)  [Clang 17.0.0 (clang-1700.3.19.1)]
+Virtual env:     True
+Conda env:       False
+
+Briefcase:       0.3.24
+Target platform: macOS
+Target format:   app
+
+Environment Variables:
+	BUNDLED_DEBUGPY_PATH=/Users/mark/.vscode/extensions/ms-python.debugpy-2025.14.1-darwin-arm64/bundled/libs/debugpy
+	CLAUDE_CODE_SSE_PORT=47587
+	COLORTERM=truecolor
+	COMMAND_MODE=unix2003
+	ENABLE_IDE_INTEGRATION=true
+	GEMINI_CLI_IDE_SERVER_PORT=57675
+	GEMINI_CLI_IDE_WORKSPACE_PATH=/Users/mark/Documents/Dev/deep-organizer
+	GIT_ASKPASS=********************
+	HOME=/Users/mark
+	HOMEBREW_CELLAR=/opt/homebrew/Cellar
+	HOMEBREW_PREFIX=/opt/homebrew
+	HOMEBREW_REPOSITORY=/opt/homebrew
+	INFOPATH=/opt/homebrew/share/info:/opt/homebrew/share/info:
+	LANG=C.UTF-8
+	LC_CTYPE=UTF-8
+	LESS=-R
+	LOGNAME=mark
+	LSCOLORS=Gxfxcxdxbxegedabagacad
+	LS_COLORS=di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43
+	MallocNanoZone=0
+	OLDPWD=/Users/mark/Documents/Dev/deep-organizer
+	ORIGINAL_XDG_CURRENT_DESKTOP=undefined
+	OSLogRateLimit=64
+	PAGER=less
+	PATH=/Users/mark/Documents/Dev/deep-organizer/.venv/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Users/mark/.vscode/extensions/ms-python.debugpy-2025.14.1-darwin-arm64/bundled/scripts/noConfigScripts:/Users/mark/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand
+	PS1=(.venv) %(?:%{[01;32m%}%1{➜%} :%{[01;31m%}%1{➜%} ) %{[36m%}%c%{[00m%} $(git_prompt_info)
+	PWD=/Users/mark/Documents/Dev/deep-organizer
+	PYDEVD_DISABLE_FILE_VALIDATION=1
+	PYTHONSTARTUP=/Users/mark/Library/Application Support/Code/User/workspaceStorage/cb71f5ab2f5278140540e3b3c6e12602/ms-python.python/pythonrc.py
+	PYTHON_BASIC_REPL=1
+	SHELL=/bin/zsh
+	SHLVL=3
+	SSH_AUTH_SOCK=/private/tmp/com.apple.launchd.DNS6BlrM86/Listeners
+	TERM=xterm-256color
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.105.0
+	TERM_SESSION_ID=FD4537B5-A248-43EA-AA7C-450C4825533A
+	TMPDIR=/var/folders/kf/6qy02l3n36j29vs1zbsw2gfw0000gn/T/
+	USER=mark
+	USER_ZDOTDIR=/Users/mark
+	VIRTUAL_ENV=/Users/mark/Documents/Dev/deep-organizer/.venv
+	VSCODE_DEBUGPY_ADAPTER_ENDPOINTS=/Users/mark/.vscode/extensions/ms-python.debugpy-2025.14.1-darwin-arm64/.noConfigDebugAdapterEndpoints/endpoint-7db82338ba27a590.txt
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=********************
+	VSCODE_GIT_ASKPASS_MAIN=********************
+	VSCODE_GIT_ASKPASS_NODE=********************
+	VSCODE_GIT_IPC_HANDLE=/var/folders/kf/6qy02l3n36j29vs1zbsw2gfw0000gn/T/vscode-git-90893f33eb.sock
+	VSCODE_INJECTION=1
+	VSCODE_PROFILE_INITIALIZED=1
+	VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+	XPC_FLAGS=0x0
+	XPC_SERVICE_NAME=0
+	ZDOTDIR=/Users/mark
+	ZSH=/Users/mark/.oh-my-zsh
+	_=/Users/mark/Documents/Dev/deep-organizer/.venv/bin/briefcase
+	__CFBundleIdentifier=com.microsoft.VSCode
+	__CF_USER_TEXT_ENCODING=0x1F5:0x0:0x0
+
+pyproject.toml:
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deep-organizer"
+version = "1.0.0"
+authors = [
+    {name = "Deep Organizer"},
+]
+description = "AI-powered file organization tool that intelligently organizes files based on content analysis"
+readme = "README.md"
+license.text = "MIT"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Topic :: System :: Filesystems",
+    "Topic :: Utilities",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+keywords = [
+    "ai",
+    "file-organization",
+    "automation",
+    "cli",
+    "productivity", 
+    "file-management",
+    "langchain",
+    "openai",
+    "gpt"
+]
+dependencies = [
+    "langgraph",
+    "langchain[anthropic]",
+    "python-dotenv",
+    "PySide6>=6.6"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=5.0.0",
+    "mypy>=0.991",
+]
+packaging = [
+    "pyinstaller>=6.4.0",
+    "dmgbuild>=1.6.0",
+]
+
+[project.scripts]
+deep-organizer = "deep_organizer.cli:main"
+deep_organizer = "deep_organizer.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/deep-organizer"
+"Bug Reports" = "https://github.com/yourusername/deep-organizer/issues"
+"Source" = "https://github.com/yourusername/deep-organizer"
+"Documentation" = "https://github.com/yourusername/deep-organizer#readme"
+
+[tool.setuptools]
+packages = ["deep_organizer"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=deep_organizer",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.briefcase]
+project_name = "Deep Organizer"
+bundle = "com.deeporganizer"
+version = "1.0.0"
+url = "https://github.com/MarkCodering/deep-organizer"
+license.text = "MIT"
+author = "Deep Organizer Team"
+author_email = "contact@deeporganizer.com"
+
+[tool.briefcase.app.deep-organizer]
+formal_name = "Deep Organizer"
+description = "AI-powered file organization tool"
+icon = "packaging/mac/deep_organizer"  # Will look for .icns/.png
+sources = ["deep_organizer"]
+requires = [
+    "langgraph",
+    "langchain[anthropic]",
+    "langchain[openai]",
+    "python-dotenv",
+    "PySide6>=6.6"
+]
+
+[tool.briefcase.app.deep-organizer.macOS]
+requires = [
+    "std-nslog~=1.0.0"
+]
+
+Briefcase Log:
+[11:46:24]                                                                                                                                                               base.py:302
+           *************************************************************************                                                                                     base.py:302
+           ** WARNING: Your Python version is unsupported!                        **                                                                                     base.py:302
+           *************************************************************************                                                                                     base.py:302
+                                                                                                                                                                         base.py:302
+               The version of Python you are using (3.9.6) is past its                                                                                                   base.py:302
+               end of life. As a result, it is highly likely your Briefcase                                                                                              base.py:302
+               version is also out of date.                                                                                                                              base.py:302
+                                                                                                                                                                         base.py:302
+               See https://devguide.python.org/versions/ for details on currently                                                                                        base.py:302
+               supported Python versions.                                                                                                                                base.py:302
+                                                                                                                                                                         base.py:302
+           *************************************************************************                                                                                     base.py:302
+                                                                                                                                                                      __main__.py:42
+           Unable to run Briefcase command. The project configuration requires                                                                                        __main__.py:43
+           Python versions >=3.10, but the environment's Python                                                                                                       __main__.py:43
+           version is 3.9.6. Please run Briefcase using a Python                                                                                                      __main__.py:43
+           version that satisfies the project's requirements.                                                                                                         __main__.py:43
+           Saving log... started                                                                                                                                      console.py:433
+
+Main thread traceback:
+╭─────────────────────────────────────────────────────────────────────── Traceback (most recent call last) ────────────────────────────────────────────────────────────────────────╮
+│ /Users/mark/Documents/Dev/deep-organizer/.venv/lib/python3.9/site-packages/briefcase/__main__.py:27 in main                                                                      │
+│                                                                                                                                                                                  │
+│   24 │   │   │   Path.cwd() / "pyproject.toml",                                                                                                                                  │
+│   25 │   │   │   overrides=overrides,                                                                                                                                            │
+│   26 │   │   )                                                                                                                                                                   │
+│ ❱ 27 │   │   command(**options)                                                                                                                                                  │
+│   28 │   except HelpText as e:                                                                                                                                                   │
+│   29 │   │   console.info()                                                                                                                                                      │
+│   30 │   │   console.info(str(e))                                                                                                                                                │
+│                                                                                                                                                                                  │
+│ ╭───────────────────────────────────────── locals ─────────────────────────────────────────╮                                                                                     │
+│ │       command = <briefcase.platforms.macOS.app.macOSAppRunCommand object at 0x105fa38b0> │                                                                                     │
+│ │       console = <briefcase.console.Console object at 0x100eac5e0>                        │                                                                                     │
+│ │             e = UnsupportedPythonVersion()                                               │                                                                                     │
+│ │ extra_cmdline = []                                                                       │                                                                                     │
+│ │       options = {                                                                        │                                                                                     │
+│ │                 │   'appname': None,                                                     │                                                                                     │
+│ │                 │   'update': False,                                                     │                                                                                     │
+│ │                 │   'update_requirements': False,                                        │                                                                                     │
+│ │                 │   'update_support': False,                                             │                                                                                     │
+│ │                 │   'update_stub': False,                                                │                                                                                     │
+│ │                 │   'update_resources': False,                                           │                                                                                     │
+│ │                 │   'no_update': False,                                                  │                                                                                     │
+│ │                 │   'test_mode': False,                                                  │                                                                                     │
+│ │                 │   'passthrough': []                                                    │                                                                                     │
+│ │                 }                                                                        │                                                                                     │
+│ │     overrides = {}                                                                       │                                                                                     │
+│ │        result = 200                                                                      │                                                                                     │
+│ ╰──────────────────────────────────────────────────────────────────────────────────────────╯                                                                                     │
+│                                                                                                                                                                                  │
+│ /Users/mark/Documents/Dev/deep-organizer/.venv/lib/python3.9/site-packages/briefcase/commands/run.py:319 in __call__                                                             │
+│                                                                                                                                                                                  │
+│   316 │   │   else:                                                                                                                                                              │
+│   317 │   │   │   state = None                                                                                                                                                   │
+│   318 │   │                                                                                                                                                                      │
+│ ❱ 319 │   │   self.verify_app(app)                                                                                                                                               │
+│   320 │   │                                                                                                                                                                      │
+│   321 │   │   if app.external_package_path:                                                                                                                                      │
+│   322 │   │   │   raise BriefcaseCommandError(                                                                                                                                   │
+│                                                                                                                                                                                  │
+│ ╭────────────────────────────────────────────────────────────────────────── locals ───────────────────────────────────────────────────────────────────────────╮                  │
+│ │                 app = <com.deeporganizer.deep-organizer v1.0.0 AppConfig>                                                                                   │                  │
+│ │             appname = None                                                                                                                                  │                  │
+│ │           exec_file = PosixPath('/Users/mark/Documents/Dev/deep-organizer/build/deep-organizer/macos/app/Deep Organizer.app/Contents/MacOS/Deep Organizer') │                  │
+│ │           no_update = False                                                                                                                                 │                  │
+│ │             options = {}                                                                                                                                    │                  │
+│ │         passthrough = []                                                                                                                                    │                  │
+│ │                self = <briefcase.platforms.macOS.app.macOSAppRunCommand object at 0x105fa38b0>                                                              │                  │
+│ │               state = None                                                                                                                                  │                  │
+│ │       template_file = PosixPath('/Users/mark/Documents/Dev/deep-organizer/build/deep-organizer/macos/app')                                                  │                  │
+│ │           test_mode = False                                                                                                                                 │                  │
+│ │              update = False                                                                                                                                 │                  │
+│ │ update_requirements = False                                                                                                                                 │                  │
+│ │    update_resources = False                                                                                                                                 │                  │
+│ │         update_stub = False                                                                                                                                 │                  │
+│ │      update_support = False                                                                                                                                 │                  │
+│ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                  │
+│                                                                                                                                                                                  │
+│ /Users/mark/Documents/Dev/deep-organizer/.venv/lib/python3.9/site-packages/briefcase/commands/base.py:740 in verify_app                                                          │
+│                                                                                                                                                                                  │
+│    737 │   │   """                                                                                                                                                               │
+│    738 │   │   self.verify_app_template(app)                                                                                                                                     │
+│    739 │   │   self.verify_app_tools(app)                                                                                                                                        │
+│ ❱  740 │   │   self.verify_required_python(app)                                                                                                                                  │
+│    741 │                                                                                                                                                                         │
+│    742 │   def verify_app_tools(self, app: AppConfig):                                                                                                                           │
+│    743 │   │   """Verify that tools needed to run the command for this app exist."""                                                                                             │
+│                                                                                                                                                                                  │
+│ ╭──────────────────────────────────── locals ─────────────────────────────────────╮                                                                                              │
+│ │  app = <com.deeporganizer.deep-organizer v1.0.0 AppConfig>                      │                                                                                              │
+│ │ self = <briefcase.platforms.macOS.app.macOSAppRunCommand object at 0x105fa38b0> │                                                                                              │
+│ ╰─────────────────────────────────────────────────────────────────────────────────╯                                                                                              │
+│                                                                                                                                                                                  │
+│ /Users/mark/Documents/Dev/deep-organizer/.venv/lib/python3.9/site-packages/briefcase/commands/base.py:793 in verify_required_python                                              │
+│                                                                                                                                                                                  │
+│    790 │   │   running_version = platform.python_version()                                                                                                                       │
+│    791 │   │                                                                                                                                                                     │
+│    792 │   │   if not spec.contains(running_version, prereleases=True):                                                                                                          │
+│ ❱  793 │   │   │   raise UnsupportedPythonVersion(                                                                                                                               │
+│    794 │   │   │   │   version_specifier=requires_python, running_version=running_version                                                                                        │
+│    795 │   │   │   )                                                                                                                                                             │
+│    796                                                                                                                                                                           │
+│                                                                                                                                                                                  │
+│ ╭────────────────────────────────────────── locals ──────────────────────────────────────────╮                                                                                   │
+│ │             app = <com.deeporganizer.deep-organizer v1.0.0 AppConfig>                      │                                                                                   │
+│ │ requires_python = '>=3.10'                                                                 │                                                                                   │
+│ │ running_version = '3.9.6'                                                                  │                                                                                   │
+│ │            self = <briefcase.platforms.macOS.app.macOSAppRunCommand object at 0x105fa38b0> │                                                                                   │
+│ │            spec = <Specifier('>=3.10')>                                                    │                                                                                   │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────╯                                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+UnsupportedPythonVersion: Unable to run Briefcase command. The project configuration requires
+Python versions >=3.10, but the environment's Python
+version is 3.9.6. Please run Briefcase using a Python
+version that satisfies the project's requirements.
+

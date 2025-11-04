@@ -10,8 +10,8 @@ authors = [
 ]
 description = "AI-powered file organization tool that intelligently organizes files based on content analysis"
 readme = "README.md"
-license = {text = "MIT"}
-requires-python = ">=3.8"
+license.text = "MIT"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
@@ -20,8 +20,6 @@ classifiers = [
     "Topic :: Utilities",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -42,7 +40,7 @@ dependencies = [
     "langgraph",
     "langchain[anthropic]",
     "python-dotenv",
-    "PySide6>=6.6"
+    "PyQt6>=6.7"
 ]
 
 [project.optional-dependencies]
@@ -74,7 +72,7 @@ packages = ["deep_organizer"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py310']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -100,7 +98,7 @@ ensure_newline_before_comments = true
 line_length = 88
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -126,7 +124,7 @@ project_name = "Deep Organizer"
 bundle = "com.deeporganizer"
 version = "1.0.0"
 url = "https://github.com/MarkCodering/deep-organizer"
-license = "MIT"
+license.text = "MIT"
 author = "Deep Organizer Team"
 author_email = "contact@deeporganizer.com"
 
@@ -135,15 +133,18 @@ formal_name = "Deep Organizer"
 description = "AI-powered file organization tool"
 icon = "packaging/mac/deep_organizer"  # Will look for .icns/.png
 sources = ["deep_organizer"]
+# Entry point - must be a callable function
+app_start_source = "deep_organizer.gui:run_app"
 requires = [
     "langgraph",
     "langchain[anthropic]",
     "langchain[openai]",
     "python-dotenv",
-    "PySide6>=6.6"
+    "PyQt6>=6.7"
 ]
 
 [tool.briefcase.app.deep-organizer.macOS]
 requires = [
     "std-nslog~=1.0.0"
 ]
+universal_build = false

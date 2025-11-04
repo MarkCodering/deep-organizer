@@ -4,11 +4,11 @@
 
 ## Overview
 
-Deep Organizer is now a native-feeling desktop experience for macOS crafted with PySide6. The modern interface guides you through selecting a workspace, configuring your preferred AI model, and running a dry run or full organization in just a few clicks. Behind the scenes it still uses LangGraph and OpenAI (or Anthropic) models to intelligently analyze and organize files, creating folders and moving documents exactly where they belong.
+Deep Organizer is now a native-feeling desktop experience for macOS crafted with PyQt6. The modern interface guides you through selecting a workspace, configuring your preferred AI model, and running a dry run or full organization in just a few clicks. Behind the scenes it still uses LangGraph and OpenAI (or Anthropic) models to intelligently analyze and organize files, creating folders and moving documents exactly where they belong.
 
 ## Features
 
-- 🍎 **Native macOS polish**: Gradient hero header, glassmorphism cards, and SF Pro typography for a first-class desktop feel
+- 🍎 **Native macOS polish**: PyQt6-driven gradient hero header, glassmorphism cards, and SF Pro typography for a first-class desktop feel
 - 🧠 **AI-powered analysis**: Uses OpenAI or Anthropic models to understand file content and context
 - 📂 **Smart folder creation**: Automatically creates descriptive folders with proper naming
 - 🔑 **In-app API key management**: Store keys locally, toggle visibility, and run sessions without touching the shell
@@ -20,7 +20,7 @@ Deep Organizer is now a native-feeling desktop experience for macOS crafted with
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.10 or higher
 - OpenAI API key (for GPT model access)
 
 ### Installation

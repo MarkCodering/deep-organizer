@@ -2,6 +2,8 @@
 
 ## Installation
 
+Requires Python 3.10 or newer.
+
 ```bash
 pip install briefcase
 ```
@@ -30,27 +32,33 @@ requires = [
     "langchain[anthropic]",
     "langchain[openai]",
     "python-dotenv",
-    "PySide6>=6.6"
+    "PyQt6>=6.7"
 ]
 
 [tool.briefcase.app.deep-organizer.macOS]
 requires = [
     "std-nslog~=1.0.0"
 ]
+universal_build = false  # Target Apple Silicon only to avoid universal merge issues
 ```
 
 ## Build Commands
 
 ```bash
+# If you previously built with PySide6, remove cached artefacts
+rm -rf build/deep-organizer dist/deep-organizer ~/.briefcase/support/*
+
 # Create the app scaffold
 briefcase create
 
 # Build the app
 briefcase build
 
+# Refresh the bundle and reinstall dependencies
+briefcase update -r
+
 # Run the app (for testing)
 briefcase run
-
 # Package for distribution (creates .app bundle)
 briefcase package
 
@@ -59,6 +67,7 @@ briefcase package --adhoc-sign
 ```
 
 ## Advantages over PyInstaller
+
 - **Smaller bundle size** (typically 30-50% smaller)
 - **Faster startup** (lazy loading)
 - **Native look & feel** (proper macOS integration)

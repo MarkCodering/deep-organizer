@@ -7,9 +7,10 @@ import sys
 from dataclasses import dataclass
 from typing import Optional, Set
 
-from PySide6.QtCore import QObject, Qt, QThread, Signal, Slot, QSettings
-from PySide6.QtGui import QColor, QFont, QPalette
-from PySide6.QtWidgets import (
+from PyQt6.QtCore import QSettings, QObject, QThread, Qt, pyqtSignal, pyqtSlot
+from PyQt6.QtGui import QColor, QFont, QPalette
+from PyQt6.QtWidgets import (
+    QBoxLayout,
     QApplication,
     QCheckBox,
     QComboBox,
@@ -22,15 +23,25 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMainWindow,
     QMessageBox,
-    QPushButton,
     QProgressBar,
+    QPushButton,
+    QScrollArea,
     QSpinBox,
     QStatusBar,
-    QToolButton,
+    QSizePolicy,
     QTextEdit,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
+
+# Backward compatibility for older PyQt builds during bundled updates
+if not hasattr(QLineEdit, "EchoMode"):
+    raise ImportError("PyQt6 6.0+ with EchoMode enum is required.")
+if not hasattr(QLineEdit, "Password"):
+    QLineEdit.Password = QLineEdit.EchoMode.Password  # type: ignore[attr-defined]
+if not hasattr(QLineEdit, "Normal"):
+    QLineEdit.Normal = QLineEdit.EchoMode.Normal  # type: ignore[attr-defined]
 
 from .core import FileOrganizer
 
@@ -50,15 +61,15 @@ class OrganizerConfig:
 class OrganizerWorker(QObject):
     """Background worker that executes the organization process."""
 
-    finished = Signal(dict)
-    failed = Signal(str)
-    progress = Signal(str)
+    finished = pyqtSignal(dict)
+    failed = pyqtSignal(str)
+    progress = pyqtSignal(str)
 
     def __init__(self, config: OrganizerConfig) -> None:
         super().__init__()
         self._config = config
 
-    @Slot()
+    @pyqtSlot()
     def run(self) -> None:
         try:
             self.progress.emit("Initializing organizer…")
@@ -87,7 +98,8 @@ class OrganizerWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Deep Organizer")
-        self.setMinimumSize(1080, 720)
+        self.setMinimumSize(840, 600)
+        self.resize(980, 680)
 
         self._thread: Optional[QThread] = None
         self._worker: Optional[OrganizerWorker] = None
@@ -138,19 +150,19 @@ class OrganizerWindow(QMainWindow):
         self._api_key_field = QLineEdit()
         self._api_key_field.setPlaceholderText("sk-… or claude-api-key")
         self._api_key_field.setMinimumHeight(44)
-        self._api_key_field.setEchoMode(QLineEdit.Password)
+        self._api_key_field.setEchoMode(QLineEdit.EchoMode.Password)
         self._api_key_field.textChanged.connect(self._handle_api_key_change)
 
         self._api_toggle = QToolButton()
         self._api_toggle.setCheckable(True)
         self._api_toggle.setObjectName("tertiaryButton")
-        self._api_toggle.setCursor(Qt.PointingHandCursor)
+        self._api_toggle.setCursor(Qt.CursorShape.PointingHandCursor)
         self._api_toggle.setText("Show")
         self._api_toggle.toggled.connect(self._toggle_api_visibility)
 
         self._save_api_button = QPushButton("Save for this Mac")
         self._save_api_button.setObjectName("secondaryButton")
-        self._save_api_button.setCursor(Qt.PointingHandCursor)
+        self._save_api_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self._save_api_button.clicked.connect(self._save_api_key)
 
         self._log_view = QTextEdit()
@@ -164,12 +176,12 @@ class OrganizerWindow(QMainWindow):
         self._start_button = QPushButton("Start Organizing")
         self._start_button.setDefault(True)
         self._start_button.setObjectName("primaryButton")
-        self._start_button.setCursor(Qt.PointingHandCursor)
+        self._start_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self._start_button.clicked.connect(self._start_organizing)
 
         self._directory_button = QPushButton("Browse…")
         self._directory_button.setObjectName("secondaryButton")
-        self._directory_button.setCursor(Qt.PointingHandCursor)
+        self._directory_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self._directory_button.setMinimumHeight(40)
         self._directory_button.clicked.connect(self._select_directory)
 
@@ -182,7 +194,7 @@ class OrganizerWindow(QMainWindow):
 
         self._status_chip = QLabel("Ready")
         self._status_chip.setObjectName("statusChip")
-        self._status_chip.setAlignment(Qt.AlignCenter)
+        self._status_chip.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._status_chip.setProperty("state", "ready")
         self._status_chip.setMinimumWidth(120)
 
@@ -190,54 +202,64 @@ class OrganizerWindow(QMainWindow):
 
         self._load_saved_api_key()
         self._configure_palette()
-        self.setCentralWidget(self._build_layout())
+        root = self._build_layout()
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll.setWidget(root)
+        self._scroll_area = scroll
+        self.setCentralWidget(scroll)
         self._update_status_chip("ready", "Ready")
         self._sync_api_status()
+        self._update_layout_mode(self.width())
 
     def _configure_palette(self) -> None:
         palette = self.palette()
-        palette.setColor(QPalette.Window, QColor("#F3F4F6"))
-        palette.setColor(QPalette.WindowText, QColor("#0F172A"))
-        palette.setColor(QPalette.Base, QColor("#FFFFFF"))
-        palette.setColor(QPalette.AlternateBase, QColor("#F8FAFC"))
-        palette.setColor(QPalette.Text, QColor("#0F172A"))
-        palette.setColor(QPalette.Button, QColor("#2563EB"))
-        palette.setColor(QPalette.ButtonText, QColor("#F8FAFC"))
-        palette.setColor(QPalette.Highlight, QColor("#2563EB"))
-        palette.setColor(QPalette.HighlightedText, QColor("#F8FAFC"))
+        palette.setColor(QPalette.ColorRole.Window, QColor("#F8FAFC"))
+        palette.setColor(QPalette.ColorRole.WindowText, QColor("#0F172A"))
+        palette.setColor(QPalette.ColorRole.Base, QColor("#FFFFFF"))
+        palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#EEF2FF"))
+        palette.setColor(QPalette.ColorRole.Text, QColor("#0F172A"))
+        palette.setColor(QPalette.ColorRole.Button, QColor("#4F46E5"))
+        palette.setColor(QPalette.ColorRole.ButtonText, QColor("#F8FAFC"))
+        palette.setColor(QPalette.ColorRole.Highlight, QColor("#4F46E5"))
+        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#F8FAFC"))
         self.setPalette(palette)
 
         app = QApplication.instance()
         if app:
             app.setPalette(palette)
-            app.setFont(QFont("SF Pro Text", 12))
+            app.setFont(QFont("SF Pro Text", 11))
 
         self.setStyleSheet(
             """
             QWidget#root {
-                background-color: #F3F4F6;
+                background-color: #F8FAFC;
             }
             QFrame#heroPanel {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #2563EB, stop:1 #14B8A6);
-                border-radius: 28px;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #4F46E5, stop:1 #0EA5E9);
+                border-radius: 20px;
             }
             QLabel#heroTitle {
-                font-size: 32px;
+                font-size: 26px;
                 font-weight: 700;
-                color: #FDFDFC;
+                color: #FDFEFF;
+                letter-spacing: 0.3px;
             }
             QLabel#heroSubtitle {
-                color: rgba(248, 250, 252, 0.88);
-                font-size: 16px;
+                color: rgba(248, 250, 252, 0.92);
+                font-size: 14px;
             }
             QLabel#heroDetail {
-                color: rgba(241, 244, 248, 0.78);
-                font-size: 13px;
+                color: rgba(241, 244, 248, 0.82);
+                font-size: 12px;
             }
             QLabel#statusChip {
-                border-radius: 14px;
-                padding: 6px 14px;
-                font-size: 13px;
+                border-radius: 12px;
+                padding: 4px 12px;
+                font-size: 12px;
                 font-weight: 600;
             }
             QLabel#statusChip[state="ready"] {
@@ -257,113 +279,111 @@ class OrganizerWindow(QMainWindow):
                 color: #7F1D1D;
             }
             QLabel#apiStatus {
-                border-radius: 12px;
-                padding: 6px 12px;
-                font-size: 13px;
+                border-radius: 10px;
+                padding: 4px 10px;
+                font-size: 12px;
                 font-weight: 600;
             }
             QLabel#apiStatus[state="ready"] {
-                background-color: rgba(134, 239, 172, 0.35);
+                background-color: rgba(134, 239, 172, 0.32);
                 color: #065F46;
             }
             QLabel#apiStatus[state="missing"] {
-                background-color: rgba(251, 191, 36, 0.35);
+                background-color: rgba(251, 191, 36, 0.32);
                 color: #92400E;
             }
             QFrame[card="true"] {
                 background-color: #FFFFFF;
-                border-radius: 24px;
+                border-radius: 18px;
+                border: 1px solid rgba(148, 163, 184, 0.18);
             }
             QFrame[section="true"] {
                 background-color: rgba(15, 23, 42, 0.035);
-                border-radius: 18px;
+                border-radius: 14px;
             }
             QLabel#sectionTitle {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 600;
                 color: #0F172A;
             }
-            QLabel#sectionHelper {
+            QLabel#sectionHelper, QLabel#tipsList {
                 color: #475569;
-                font-size: 13px;
+                font-size: 12px;
             }
             QLabel#formLabel {
                 color: #1F2937;
                 font-weight: 500;
-                padding-bottom: 4px;
+                padding-bottom: 2px;
             }
             QLabel#tipsTitle, QLabel#cardTitle {
-                font-size: 17px;
+                font-size: 15px;
                 font-weight: 600;
                 color: #0F172A;
             }
-            QLabel#tipsList {
-                color: #475569;
-                font-size: 14px;
-            }
             QLineEdit, QComboBox, QSpinBox, QTextEdit {
                 background-color: #FFFFFF;
-                border: 1px solid rgba(148, 163, 184, 0.5);
-                border-radius: 12px;
-                padding: 10px 12px;
-                font-size: 14px;
+                border: 1px solid rgba(148, 163, 184, 0.45);
+                border-radius: 10px;
+                padding: 9px 12px;
+                font-size: 13px;
             }
             QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QTextEdit:focus {
-                border: 1px solid #2563EB;
+                border: 1px solid #4F46E5;
             }
             QCheckBox {
-                font-size: 14px;
+                font-size: 13px;
                 color: #1E293B;
             }
             QTextEdit#logView {
                 background-color: #0F172A;
                 color: #F8FAFC;
                 border: none;
-                border-radius: 16px;
-                padding: 16px;
+                border-radius: 14px;
+                padding: 14px;
+                font-size: 12px;
             }
             QPushButton#primaryButton {
-                background-color: #2563EB;
+                background-color: #4F46E5;
                 color: #F8FAFC;
                 font-weight: 600;
-                padding: 14px 28px;
-                border-radius: 20px;
-            }
-            QPushButton#primaryButton:disabled {
-                background-color: rgba(148, 163, 184, 0.4);
-                color: rgba(255, 255, 255, 0.7);
-            }
-            QPushButton#primaryButton:hover:!disabled {
-                background-color: #1D4ED8;
-            }
-            QPushButton#secondaryButton {
-                background-color: rgba(37, 99, 235, 0.1);
-                color: #1E3A8A;
-                font-weight: 600;
-                padding: 10px 20px;
+                padding: 12px 24px;
                 border-radius: 16px;
             }
+            QPushButton#primaryButton:disabled {
+                background-color: rgba(148, 163, 184, 0.45);
+                color: rgba(255, 255, 255, 0.72);
+            }
+            QPushButton#primaryButton:hover:!disabled {
+                background-color: #4338CA;
+            }
+            QPushButton#secondaryButton {
+                background-color: rgba(79, 70, 229, 0.10);
+                color: #3730A3;
+                font-weight: 600;
+                padding: 9px 18px;
+                border-radius: 14px;
+            }
             QPushButton#secondaryButton:hover {
-                background-color: rgba(37, 99, 235, 0.18);
+                background-color: rgba(79, 70, 229, 0.18);
             }
             QToolButton#tertiaryButton {
                 background-color: transparent;
                 border: none;
                 color: rgba(15, 23, 42, 0.7);
                 font-weight: 600;
-                padding: 0 12px;
+                padding: 0 10px;
             }
             QToolButton#tertiaryButton:hover {
-                color: rgba(29, 78, 216, 0.9);
+                color: rgba(79, 70, 229, 0.9);
             }
             QProgressBar#progressBar {
-                background-color: rgba(37, 99, 235, 0.12);
+                background-color: rgba(79, 70, 229, 0.12);
                 border: none;
                 border-radius: 2px;
                 min-height: 4px;
             }
             QProgressBar#progressBar::chunk {
-                background-color: #2563EB;
+                background-color: #4F46E5;
                 border-radius: 2px;
             }
             """
@@ -372,69 +392,119 @@ class OrganizerWindow(QMainWindow):
     def _build_layout(self) -> QWidget:
         content = QWidget()
         content.setObjectName("root")
-        main_layout = QVBoxLayout(content)
-        main_layout.setContentsMargins(32, 32, 32, 32)
-        main_layout.setSpacing(24)
+        self._main_layout = QVBoxLayout(content)
+        self._main_layout.setContentsMargins(24, 24, 24, 24)
+        self._main_layout.setSpacing(20)
 
-        hero = self._create_hero_header()
-        main_layout.addWidget(hero)
+        self._hero_panel = self._create_hero_header()
+        self._main_layout.addWidget(self._hero_panel)
 
-        body_layout = QHBoxLayout()
-        body_layout.setSpacing(18)
-        body_layout.addWidget(self._create_form_card(), stretch=2)
-        body_layout.addWidget(self._create_insights_card(), stretch=1)
-        main_layout.addLayout(body_layout)
+        self._body_layout = QBoxLayout(QBoxLayout.Direction.LeftToRight)
+        self._body_layout.setSpacing(18)
+        self._form_card = self._create_form_card()
+        self._insights_card = self._create_insights_card()
+        self._form_card.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
+        self._insights_card.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred
+        )
+        self._insights_card.setMaximumWidth(360)
+        self._body_layout.addWidget(self._form_card, stretch=2)
+        self._body_layout.addWidget(self._insights_card, stretch=1)
+        self._main_layout.addLayout(self._body_layout)
 
-        main_layout.addWidget(self._create_log_card(), stretch=1)
+        self._log_card = self._create_log_card()
+        self._main_layout.addWidget(self._log_card)
 
         footer = QHBoxLayout()
         footer.setSpacing(12)
         footer.addWidget(self._progress_bar, stretch=1)
         footer.addStretch(1)
         footer.addWidget(self._start_button)
-        main_layout.addLayout(footer)
+        self._main_layout.addLayout(footer)
 
         return content
+
+    def resizeEvent(self, event) -> None:  # type: ignore[override]
+        super().resizeEvent(event)
+        self._update_layout_mode(event.size().width())
+
+    def _update_layout_mode(self, width: int) -> None:
+        if not hasattr(self, "_body_layout"):
+            return
+
+        compact = width < 1180
+        target_direction = (
+            QBoxLayout.Direction.TopToBottom
+            if compact
+            else QBoxLayout.Direction.LeftToRight
+        )
+        if self._body_layout.direction() != target_direction:
+            self._body_layout.setDirection(target_direction)
+
+        if compact:
+            self._body_layout.setSpacing(14)
+            self._insights_card.setMaximumWidth(16777215)
+            self._insights_card.setSizePolicy(
+                QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+            )
+            self._main_layout.setContentsMargins(18, 18, 18, 18)
+            self._body_layout.setStretchFactor(self._form_card, 0)
+            self._body_layout.setStretchFactor(self._insights_card, 0)
+        else:
+            self._body_layout.setSpacing(18)
+            self._insights_card.setMaximumWidth(360)
+            self._insights_card.setSizePolicy(
+                QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred
+            )
+            self._main_layout.setContentsMargins(24, 24, 24, 24)
+            self._body_layout.setStretchFactor(self._form_card, 2)
+            self._body_layout.setStretchFactor(self._insights_card, 1)
+
+        self._form_card.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
 
     def _create_hero_header(self) -> QFrame:
         hero = QFrame()
         hero.setObjectName("heroPanel")
         layout = QVBoxLayout(hero)
-        layout.setContentsMargins(32, 32, 32, 32)
-        layout.setSpacing(16)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(12)
 
         status_row = QHBoxLayout()
-        status_row.addWidget(self._status_chip, alignment=Qt.AlignLeft)
+        status_row.addWidget(self._status_chip, alignment=Qt.AlignmentFlag.AlignLeft)
         status_row.addStretch()
         layout.addLayout(status_row)
 
-        title = QLabel("Deep Organizer for macOS")
+        title = QLabel("Deep Organizer")
         title.setObjectName("heroTitle")
         layout.addWidget(title)
 
         subtitle = QLabel(
-            "Effortlessly curate your workspace with an AI assistant that understands context."
+            "A calm space to tidy projects, files, and notes with a thoughtful AI assist."
         )
         subtitle.setObjectName("heroSubtitle")
         subtitle.setWordWrap(True)
         layout.addWidget(subtitle)
 
         detail = QLabel(
-            "Choose a directory, preview suggestions in dry-run mode, then let Deep Organizer tidy things up when you're ready."
+            "Pick a folder, preview the plan, and run the organizer when it feels right."
         )
         detail.setObjectName("heroDetail")
         detail.setWordWrap(True)
         layout.addWidget(detail)
 
-        self._apply_card_shadow(hero, blur=46, y_offset=28, alpha=0.25)
+        self._apply_card_shadow(hero, blur=36, y_offset=18, alpha=0.18)
         return hero
 
     def _create_form_card(self) -> QFrame:
         card = QFrame()
         card.setProperty("card", True)
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(28, 28, 28, 28)
-        layout.setSpacing(20)
+        layout.setContentsMargins(22, 22, 22, 22)
+        layout.setSpacing(16)
 
         layout.addWidget(self._create_workspace_section())
         layout.addWidget(self._create_preferences_section())
@@ -452,9 +522,7 @@ class OrganizerWindow(QMainWindow):
         dir_layout.addWidget(self._directory_button)
         section_layout.addLayout(dir_layout)
 
-        env_label = QLabel(
-            "Pick a directory to organize. Provide credentials via the API Access section, a .env file, or environment variables."
-        )
+        env_label = QLabel("Choose a workspace folder to curate. You can set API keys below or via environment variables.")
         env_label.setObjectName("sectionHelper")
         env_label.setWordWrap(True)
         section_layout.addWidget(env_label)
@@ -465,9 +533,13 @@ class OrganizerWindow(QMainWindow):
         section, section_layout = self._build_section("AI Preferences")
 
         form = QFormLayout()
-        form.setLabelAlignment(Qt.AlignLeft)
-        form.setFormAlignment(Qt.AlignTop)
-        form.setSpacing(18)
+        form.setLabelAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
+        form.setFormAlignment(
+            Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
+        )
+        form.setSpacing(14)
 
         form.addRow(self._build_form_label("AI model"), self._model_select)
         form.addRow(
@@ -489,24 +561,22 @@ class OrganizerWindow(QMainWindow):
         card = QFrame()
         card.setProperty("card", True)
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(28, 28, 28, 28)
-        layout.setSpacing(18)
+        layout.setContentsMargins(22, 22, 22, 22)
+        layout.setSpacing(14)
 
-        title = QLabel("Quick Tips")
+        title = QLabel("Quick glance")
         title.setObjectName("tipsTitle")
         layout.addWidget(title)
 
-        highlight = QLabel(
-            "Optimized for macOS Sonoma+ with native fonts, crisp shadows, and smooth gradients."
-        )
+        highlight = QLabel("Designed for smaller displays with gentle contrast and accessible controls.")
         highlight.setObjectName("sectionHelper")
         highlight.setWordWrap(True)
         layout.addWidget(highlight)
 
         tips = QLabel(
-            "• Start in Dry run mode to review the suggested structure.<br>"
-            "• Add folders like `node_modules` or `venv` to the excluded list.<br>"
-            "• Keep a `.deep-organizer-ignore` file to persist exclusions."
+            "• Use Dry run to preview moves.<br>"
+            "• Add clutter folders like `node_modules` to exclusions.<br>"
+            "• Keep `.deep-organizer-ignore` for recurring skips."
         )
         tips.setObjectName("tipsList")
         tips.setWordWrap(True)
@@ -524,9 +594,7 @@ class OrganizerWindow(QMainWindow):
     def _create_credentials_section(self) -> QWidget:
         section, section_layout = self._build_section("API Access")
 
-        helper = QLabel(
-            "Store an API key locally or use a temporary one below. Saved keys are scoped to this user account."
-        )
+        helper = QLabel("Save a key for future sessions or apply a one-time token just for now.")
         helper.setObjectName("sectionHelper")
         helper.setWordWrap(True)
         section_layout.addWidget(helper)
@@ -538,12 +606,12 @@ class OrganizerWindow(QMainWindow):
         section_layout.addLayout(api_row)
 
         buttons_row = QHBoxLayout()
-        buttons_row.setSpacing(12)
+        buttons_row.setSpacing(10)
         buttons_row.addWidget(self._save_api_button)
 
         use_once = QPushButton("Use for this session")
         use_once.setObjectName("secondaryButton")
-        use_once.setCursor(Qt.PointingHandCursor)
+        use_once.setCursor(Qt.CursorShape.PointingHandCursor)
         use_once.clicked.connect(self._apply_api_key_once)
         buttons_row.addWidget(use_once)
 
@@ -557,7 +625,7 @@ class OrganizerWindow(QMainWindow):
         card.setProperty("card", True)
         card.setObjectName("logCardContainer")
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(28, 28, 28, 28)
+        layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(12)
 
         title = QLabel("Activity")
@@ -572,8 +640,8 @@ class OrganizerWindow(QMainWindow):
         section = QFrame()
         section.setProperty("section", True)
         layout = QVBoxLayout(section)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(12)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(10)
 
         header = QLabel(title)
         header.setObjectName("sectionTitle")
@@ -815,7 +883,7 @@ class OrganizerWindow(QMainWindow):
 
     def _toggle_api_visibility(self, checked: bool) -> None:
         self._api_key_field.setEchoMode(
-            QLineEdit.Normal if checked else QLineEdit.Password
+            QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.Password
         )
         self._api_toggle.setText("Hide" if checked else "Show")
 
