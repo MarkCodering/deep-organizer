@@ -10,12 +10,9 @@ from typing import Optional, Set
 from PyQt6.QtCore import QSettings, QObject, QThread, Qt, pyqtSignal, pyqtSlot
 from PyQt6.QtGui import QColor, QFont, QPalette
 from PyQt6.QtWidgets import (
-    QBoxLayout,
     QApplication,
     QCheckBox,
-    QComboBox,
     QFileDialog,
-    QFormLayout,
     QFrame,
     QGraphicsDropShadowEffect,
     QHBoxLayout,
@@ -26,9 +23,7 @@ from PyQt6.QtWidgets import (
     QProgressBar,
     QPushButton,
     QScrollArea,
-    QSpinBox,
     QStatusBar,
-    QSizePolicy,
     QTextEdit,
     QToolButton,
     QVBoxLayout,
@@ -42,6 +37,8 @@ if not hasattr(QLineEdit, "Password"):
     QLineEdit.Password = QLineEdit.EchoMode.Password  # type: ignore[attr-defined]
 if not hasattr(QLineEdit, "Normal"):
     QLineEdit.Normal = QLineEdit.EchoMode.Normal  # type: ignore[attr-defined]
+
+DEFAULT_MODEL = "openai:gpt-4o-mini"
 
 from .core import FileOrganizer
 
@@ -112,43 +109,12 @@ class OrganizerWindow(QMainWindow):
         self._directory_field.setClearButtonEnabled(True)
         self._directory_field.setMinimumHeight(44)
 
-        self._model_select = QComboBox()
-        self._model_select.addItems(
-            [
-                "openai:gpt-4o-mini",
-                "openai:gpt-4-mini",
-                "openai:gpt-4.1-mini",
-                "anthropic:claude-3-sonnet",
-            ]
-        )
-        self._model_select.setMinimumHeight(40)
-
-        self._dry_run_check = QCheckBox(
-            "Dry run (analyze without moving files)"
-        )
+        self._dry_run_check = QCheckBox("Preview changes first")
         self._dry_run_check.setChecked(True)
         self._dry_run_check.setObjectName("dryRunCheck")
 
-        self._max_file_size = QSpinBox()
-        self._max_file_size.setRange(200, 10_000)
-        self._max_file_size.setSingleStep(200)
-        self._max_file_size.setValue(FileOrganizer.DEFAULT_MAX_FILE_READ_SIZE)
-        self._max_file_size.setMinimumHeight(40)
-
-        self._excluded_files = QLineEdit()
-        self._excluded_files.setPlaceholderText(
-            "Comma-separated list of additional files"
-        )
-        self._excluded_files.setMinimumHeight(40)
-
-        self._excluded_folders = QLineEdit()
-        self._excluded_folders.setPlaceholderText(
-            "Comma-separated list of additional folders"
-        )
-        self._excluded_folders.setMinimumHeight(40)
-
         self._api_key_field = QLineEdit()
-        self._api_key_field.setPlaceholderText("sk-… or claude-api-key")
+        self._api_key_field.setPlaceholderText("Paste API key (optional)")
         self._api_key_field.setMinimumHeight(44)
         self._api_key_field.setEchoMode(QLineEdit.EchoMode.Password)
         self._api_key_field.textChanged.connect(self._handle_api_key_change)
@@ -168,7 +134,7 @@ class OrganizerWindow(QMainWindow):
         self._log_view = QTextEdit()
         self._log_view.setReadOnly(True)
         self._log_view.setObjectName("logView")
-        self._log_view.setMinimumHeight(200)
+        self._log_view.setMinimumHeight(160)
 
         self._status_bar = QStatusBar()
         self.setStatusBar(self._status_bar)
@@ -213,7 +179,6 @@ class OrganizerWindow(QMainWindow):
         self.setCentralWidget(scroll)
         self._update_status_chip("ready", "Ready")
         self._sync_api_status()
-        self._update_layout_mode(self.width())
 
     def _configure_palette(self) -> None:
         palette = self.palette()
@@ -306,7 +271,7 @@ class OrganizerWindow(QMainWindow):
                 font-weight: 600;
                 color: #0F172A;
             }
-            QLabel#sectionHelper, QLabel#tipsList {
+            QLabel#sectionHelper {
                 color: #475569;
                 font-size: 12px;
             }
@@ -315,19 +280,19 @@ class OrganizerWindow(QMainWindow):
                 font-weight: 500;
                 padding-bottom: 2px;
             }
-            QLabel#tipsTitle, QLabel#cardTitle {
+            QLabel#cardTitle {
                 font-size: 15px;
                 font-weight: 600;
                 color: #0F172A;
             }
-            QLineEdit, QComboBox, QSpinBox, QTextEdit {
+            QLineEdit, QTextEdit {
                 background-color: #FFFFFF;
                 border: 1px solid rgba(148, 163, 184, 0.45);
                 border-radius: 10px;
                 padding: 9px 12px;
                 font-size: 13px;
             }
-            QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QTextEdit:focus {
+            QLineEdit:focus, QTextEdit:focus {
                 border: 1px solid #4F46E5;
             }
             QCheckBox {
@@ -392,79 +357,27 @@ class OrganizerWindow(QMainWindow):
     def _build_layout(self) -> QWidget:
         content = QWidget()
         content.setObjectName("root")
-        self._main_layout = QVBoxLayout(content)
-        self._main_layout.setContentsMargins(24, 24, 24, 24)
-        self._main_layout.setSpacing(20)
+        main_layout = QVBoxLayout(content)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(16)
 
-        self._hero_panel = self._create_hero_header()
-        self._main_layout.addWidget(self._hero_panel)
+        hero = self._create_hero_header()
+        main_layout.addWidget(hero)
 
-        self._body_layout = QBoxLayout(QBoxLayout.Direction.LeftToRight)
-        self._body_layout.setSpacing(18)
-        self._form_card = self._create_form_card()
-        self._insights_card = self._create_insights_card()
-        self._form_card.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
-        )
-        self._insights_card.setSizePolicy(
-            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred
-        )
-        self._insights_card.setMaximumWidth(360)
-        self._body_layout.addWidget(self._form_card, stretch=2)
-        self._body_layout.addWidget(self._insights_card, stretch=1)
-        self._main_layout.addLayout(self._body_layout)
+        self._main_card = self._create_form_card()
+        main_layout.addWidget(self._main_card)
 
         self._log_card = self._create_log_card()
-        self._main_layout.addWidget(self._log_card)
+        main_layout.addWidget(self._log_card)
 
         footer = QHBoxLayout()
-        footer.setSpacing(12)
+        footer.setSpacing(10)
         footer.addWidget(self._progress_bar, stretch=1)
         footer.addStretch(1)
         footer.addWidget(self._start_button)
-        self._main_layout.addLayout(footer)
+        main_layout.addLayout(footer)
 
         return content
-
-    def resizeEvent(self, event) -> None:  # type: ignore[override]
-        super().resizeEvent(event)
-        self._update_layout_mode(event.size().width())
-
-    def _update_layout_mode(self, width: int) -> None:
-        if not hasattr(self, "_body_layout"):
-            return
-
-        compact = width < 1180
-        target_direction = (
-            QBoxLayout.Direction.TopToBottom
-            if compact
-            else QBoxLayout.Direction.LeftToRight
-        )
-        if self._body_layout.direction() != target_direction:
-            self._body_layout.setDirection(target_direction)
-
-        if compact:
-            self._body_layout.setSpacing(14)
-            self._insights_card.setMaximumWidth(16777215)
-            self._insights_card.setSizePolicy(
-                QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
-            )
-            self._main_layout.setContentsMargins(18, 18, 18, 18)
-            self._body_layout.setStretchFactor(self._form_card, 0)
-            self._body_layout.setStretchFactor(self._insights_card, 0)
-        else:
-            self._body_layout.setSpacing(18)
-            self._insights_card.setMaximumWidth(360)
-            self._insights_card.setSizePolicy(
-                QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred
-            )
-            self._main_layout.setContentsMargins(24, 24, 24, 24)
-            self._body_layout.setStretchFactor(self._form_card, 2)
-            self._body_layout.setStretchFactor(self._insights_card, 1)
-
-        self._form_card.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
-        )
 
     def _create_hero_header(self) -> QFrame:
         hero = QFrame()
@@ -507,8 +420,8 @@ class OrganizerWindow(QMainWindow):
         layout.setSpacing(16)
 
         layout.addWidget(self._create_workspace_section())
-        layout.addWidget(self._create_preferences_section())
-        layout.addWidget(self._create_credentials_section())
+        layout.addWidget(self._create_run_section())
+        layout.addWidget(self._create_api_section())
 
         self._apply_card_shadow(card)
         return card
@@ -529,70 +442,22 @@ class OrganizerWindow(QMainWindow):
 
         return section
 
-    def _create_preferences_section(self) -> QWidget:
-        section, section_layout = self._build_section("AI Preferences")
+    def _create_run_section(self) -> QWidget:
+        section, section_layout = self._build_section("How to run")
 
-        form = QFormLayout()
-        form.setLabelAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        info = QLabel(
+            "Preview keeps everything in place and shows the plan. Turn it off when you're ready to tidy for real."
         )
-        form.setFormAlignment(
-            Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
-        )
-        form.setSpacing(14)
+        info.setObjectName("sectionHelper")
+        info.setWordWrap(True)
+        section_layout.addWidget(info)
 
-        form.addRow(self._build_form_label("AI model"), self._model_select)
-        form.addRow(
-            self._build_form_label("Max characters per file"), self._max_file_size
-        )
-        form.addRow(
-            self._build_form_label("Additional excluded files"), self._excluded_files
-        )
-        form.addRow(
-            self._build_form_label("Additional excluded folders"),
-            self._excluded_folders,
-        )
-        form.addRow(self._dry_run_check)
+        section_layout.addWidget(self._dry_run_check)
 
-        section_layout.addLayout(form)
         return section
 
-    def _create_insights_card(self) -> QFrame:
-        card = QFrame()
-        card.setProperty("card", True)
-        layout = QVBoxLayout(card)
-        layout.setContentsMargins(22, 22, 22, 22)
-        layout.setSpacing(14)
-
-        title = QLabel("Quick glance")
-        title.setObjectName("tipsTitle")
-        layout.addWidget(title)
-
-        highlight = QLabel("Designed for smaller displays with gentle contrast and accessible controls.")
-        highlight.setObjectName("sectionHelper")
-        highlight.setWordWrap(True)
-        layout.addWidget(highlight)
-
-        tips = QLabel(
-            "• Use Dry run to preview moves.<br>"
-            "• Add clutter folders like `node_modules` to exclusions.<br>"
-            "• Keep `.deep-organizer-ignore` for recurring skips."
-        )
-        tips.setObjectName("tipsList")
-        tips.setWordWrap(True)
-        layout.addWidget(tips)
-
-        self._api_status_label = QLabel()
-        self._api_status_label.setObjectName("apiStatus")
-        layout.addWidget(self._api_status_label)
-
-        layout.addStretch(1)
-
-        self._apply_card_shadow(card)
-        return card
-
-    def _create_credentials_section(self) -> QWidget:
-        section, section_layout = self._build_section("API Access")
+    def _create_api_section(self) -> QWidget:
+        section, section_layout = self._build_section("AI access (optional)")
 
         helper = QLabel("Save a key for future sessions or apply a one-time token just for now.")
         helper.setObjectName("sectionHelper")
@@ -618,6 +483,10 @@ class OrganizerWindow(QMainWindow):
         buttons_row.addStretch(1)
         section_layout.addLayout(buttons_row)
 
+        self._api_status_label = QLabel()
+        self._api_status_label.setObjectName("apiStatus")
+        section_layout.addWidget(self._api_status_label)
+
         return section
 
     def _create_log_card(self) -> QFrame:
@@ -628,7 +497,7 @@ class OrganizerWindow(QMainWindow):
         layout.setContentsMargins(22, 22, 22, 22)
         layout.setSpacing(12)
 
-        title = QLabel("Activity")
+        title = QLabel("Recent activity")
         title.setObjectName("cardTitle")
         layout.addWidget(title)
         layout.addWidget(self._log_view)
@@ -662,11 +531,6 @@ class OrganizerWindow(QMainWindow):
         shadow.setOffset(0, y_offset)
         shadow.setColor(QColor(15, 23, 42, int(255 * alpha)))
         widget.setGraphicsEffect(shadow)
-
-    def _build_form_label(self, text: str) -> QLabel:
-        label = QLabel(text)
-        label.setObjectName("formLabel")
-        return label
 
     def _sync_api_status(self) -> None:
         if not self._api_status_label:
@@ -706,8 +570,8 @@ class OrganizerWindow(QMainWindow):
         if not api_key:
             self._update_status_chip("error", "Missing API key")
             self._show_message(
-                "Missing OpenAI API key",
-                "Set the OPENAI_API_KEY environment variable before running the organizer.",
+                "Add your API key",
+                "Paste an OpenAI-compatible key so the organizer can understand your files.",
                 icon=QMessageBox.Icon.Warning,
             )
             return
@@ -716,11 +580,11 @@ class OrganizerWindow(QMainWindow):
 
         config = OrganizerConfig(
             directory=directory,
-            model=self._model_select.currentText(),
+            model=DEFAULT_MODEL,
             dry_run=self._dry_run_check.isChecked(),
-            max_file_size=self._max_file_size.value(),
-            excluded_files=self._parse_csv(self._excluded_files.text()),
-            excluded_folders=self._parse_csv(self._excluded_folders.text()),
+            max_file_size=FileOrganizer.DEFAULT_MAX_FILE_READ_SIZE,
+            excluded_files=set(),
+            excluded_folders=set(),
         )
 
         self._log_view.clear()
@@ -803,9 +667,6 @@ class OrganizerWindow(QMainWindow):
         self._log_view.verticalScrollBar().setValue(
             self._log_view.verticalScrollBar().maximum()
         )
-
-    def _parse_csv(self, text: str) -> Set[str]:
-        return {item.strip() for item in text.split(",") if item.strip()}
 
     def _extract_summary(self, result: dict) -> str:
         try:
