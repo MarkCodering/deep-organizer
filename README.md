@@ -2,6 +2,8 @@
 
 > An intelligent AI agent that automatically organizes files in your directories using advanced language models and content analysis.
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/deep-organizer?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=Pip+install+counts)](https://pepy.tech/projects/deep-organizer)
+
 ## Overview
 
 Deep Organizer is now a native-feeling desktop experience for macOS crafted with PyQt6. The modern interface guides you through selecting a workspace, configuring your preferred AI model, and running a dry run or full organization in just a few clicks. Behind the scenes it still uses LangGraph and OpenAI (or Anthropic) models to intelligently analyze and organize files, creating folders and moving documents exactly where they belong.
